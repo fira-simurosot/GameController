@@ -4,14 +4,13 @@ sys.path.insert(1, '../protoCompiled')
 import socket
 from protoCompiled import common_pb2
 from protoCompiled.SIM2REF import packet_pb2, replacement_pb2, command_pb2
-from protoCompiled.REF2CLI import messages_pb2
 from src.common import Robot, Ball
 
 
 class FIRASimClient():
-    def __init__(self):
-        self.ip = "127.0.0.1"
-        self.port = 50051
+    def __init__(self, ip, port):
+        self.ip = ip
+        self.port = port
 
         self.sock = socket.socket(socket.AF_INET,  # Internet
                              socket.SOCK_DGRAM)  # UDP
@@ -106,7 +105,7 @@ class FIRASimClient():
 
 
 if __name__ == "__main__":
-    cli = FIRASimClient()
+    cli = FIRASimClient('127.0.0.1', 50051)
 
     # command = messages_pb2.Command()
     # for i in range(5):
