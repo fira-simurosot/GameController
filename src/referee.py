@@ -47,6 +47,11 @@ class Referee():
         foulInfo = messages_pb2.FoulInfo()
         if self.gamestate.state == GameStateEnum.PlayOn:
             self.runStrategy_teams(frame, foulInfo)
+        elif self.gamestate.need_robot_placement():
+            if self.gamestate.need_ball_placement():
+                self.ballPlacement_teams(frame, foulInfo)
+            self.robotPlacement_teams(frame, foulInfo)
+
 
     def createGUI(self):
         self.app = QApplication(sys.argv)
@@ -131,6 +136,25 @@ class Referee():
         yelbot = self.converter.convert_protocommand_to_Robot(yellowCommand, True)
         blubot = self.converter.convert_protocommand_to_Robot(BlueCommand, False)
         self.firasimclient.send_robot_command(yelbot, blubot)
+
+    def robotPlacement_teams(self, frame, foulInfo):
+        if self.gamestate.actor == ActorEnum.Yellow:
+            yelbot = self.yellowClient.call_SetFormerRobots(frame, foulInfo)
+            blubot = self.blueClient.call_SetLaterRobots(frame, foulInfo)
+        else:
+            blubot = self.blueClient.call_SetFormerRobots(frame, foulInfo)
+            yelbot = self.yellowClient.call_SetLaterRobots(frame, foulInfo)
+        yelbot = self.converter.convert_protoRobots_to_Robot(yelbot, True)
+        blubot = self.converter.convert_protoRobots_to_Robot(blubot, False)
+        self.firasimclient.send_robot_replacement(yelbot, blubot)
+
+    def ballPlacement_teams(self, frame, foulInfo):
+        if self.gamestate.actor == ActorEnum.Yellow:
+            protoball = self.yellowClient.call_SetBall(frame, foulInfo)
+        else:
+            protoball = self.blueClient.call_SetBall(frame, foulInfo)
+        ball = self.converter.convert_protoBall_to_Ball(protoball)
+        self.firasimclient.send_ball_replacement(ball)
 
 
 if __name__ == "__main__":

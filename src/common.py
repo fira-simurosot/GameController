@@ -75,6 +75,13 @@ class GameState():
         self.state = GameStateEnum.Halt
         self.actor = ActorEnum.NoOne
 
+    def need_robot_placement(self):
+        return self.state == GameStateEnum.KickOff or self.state == GameStateEnum.Penalty or self.state == GameStateEnum.FreeKick or self.state == GameStateEnum.GoalKick or self.state == GameStateEnum.FreeBallLeftTop or self.state == GameStateEnum.FreeBallRightTop or self.state == GameStateEnum.FreeBallLeftBot or self.state == GameStateEnum.FreeBallRightBot
+
+    def need_ball_placement(self):
+        return self.state == GameStateEnum.GoalKick
+
+
 class Converter():
     def __init__(self):
         pass
