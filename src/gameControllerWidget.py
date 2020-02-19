@@ -2,12 +2,14 @@ import sys
 from PyQt5.QtWidgets import (QWidget, QGridLayout, QVBoxLayout, QPushButton, QApplication, QLabel, QComboBox, QLineEdit, QSizePolicy)
 from PyQt5.QtGui import QIcon
 from PyQt5 import uic
-from PyQt5.QtCore import QTimer
+from PyQt5.QtCore import QTimer, pyqtSignal
 from functools import partial
 
 
 
 class GameControllerWidget(QWidget):
+    button_clicked = pyqtSignal(['QString'])
+    widget_closed = pyqtSignal()
     def __init__(self):
         super(GameControllerWidget, self).__init__()
 
@@ -52,64 +54,8 @@ class GameControllerWidget(QWidget):
 
 
     def btnListener(self, buttonName):
-        pass
-        # if buttonName == 'pbPlaceKickBlue':
-        #     self.responseHandyRef.foulInfo.type = messages_pb2.FoulInfo.FoulType.PlaceKick
-        #     self.responseHandyRef.foulInfo.actorColor = messages_pb2.Color.B
-        # elif buttonName == 'pbPnaltyKickBlue':
-        #     self.responseHandyRef.foulInfo.type = messages_pb2.FoulInfo.FoulType.PenaltyKick
-        #     self.responseHandyRef.foulInfo.actorColor = messages_pb2.Color.B
-        # elif buttonName == 'pbFreeKickBlue':
-        #     self.responseHandyRef.foulInfo.type = messages_pb2.FoulInfo.FoulType.FreeKick
-        #     self.responseHandyRef.foulInfo.actorColor = messages_pb2.Color.B
-        # elif buttonName == 'pbGoalKickBlue':
-        #     self.responseHandyRef.foulInfo.type = messages_pb2.FoulInfo.FoulType.GoalKick
-        #     self.responseHandyRef.foulInfo.actorColor = messages_pb2.Color.B
-        # elif buttonName == 'pbFreeBallLeftTopBlue':
-        #     self.responseHandyRef.foulInfo.type = messages_pb2.FoulInfo.FoulType.FreeBallLeftTop
-        #     self.responseHandyRef.foulInfo.actorColor = messages_pb2.Color.B
-        # elif buttonName == 'pbFreeBallRightTopBlue':
-        #     self.responseHandyRef.foulInfo.type = messages_pb2.FoulInfo.FoulType.FreeBallRightTop
-        #     self.responseHandyRef.foulInfo.actorColor = messages_pb2.Color.B
-        # elif buttonName == 'pbFreeBallLeftBotBlue':
-        #     self.responseHandyRef.foulInfo.type = messages_pb2.FoulInfo.FoulType.FreeBallLeftBot
-        #     self.responseHandyRef.foulInfo.actorColor = messages_pb2.Color.B
-        # elif buttonName == 'pbFreeBallRightBotBlue':
-        #     self.responseHandyRef.foulInfo.type = messages_pb2.FoulInfo.FoulType.FreeBallRightBot
-        #     self.responseHandyRef.foulInfo.actorColor = messages_pb2.Color.B
-        #
-        # elif buttonName == 'pbPlaceKickYellow':
-        #     self.responseHandyRef.foulInfo.type = messages_pb2.FoulInfo.FoulType.PlaceKick
-        #     self.responseHandyRef.foulInfo.actorColor = messages_pb2.Color.Y
-        # elif buttonName == 'pbPnaltyKickYellow':
-        #     self.responseHandyRef.foulInfo.type = messages_pb2.FoulInfo.FoulType.PenaltyKick
-        #     self.responseHandyRef.foulInfo.actorColor = messages_pb2.Color.Y
-        # elif buttonName == 'pbFreeKickYellow':
-        #     self.responseHandyRef.foulInfo.type = messages_pb2.FoulInfo.FoulType.FreeKick
-        #     self.responseHandyRef.foulInfo.actorColor = messages_pb2.Color.Y
-        # elif buttonName == 'pbGoalKickYellow':
-        #     self.responseHandyRef.foulInfo.type = messages_pb2.FoulInfo.FoulType.GoalKick
-        #     self.responseHandyRef.foulInfo.actorColor = messages_pb2.Color.Y
-        # elif buttonName == 'pbFreeBallLeftTopYellow':
-        #     self.responseHandyRef.foulInfo.type = messages_pb2.FoulInfo.FoulType.FreeBallLeftTop
-        #     self.responseHandyRef.foulInfo.actorColor = messages_pb2.Color.Y
-        # elif buttonName == 'pbFreeBallRightTopYellow':
-        #     self.responseHandyRef.foulInfo.type = messages_pb2.FoulInfo.FoulType.FreeBallRightTop
-        #     self.responseHandyRef.foulInfo.actorColor = messages_pb2.Color.Y
-        # elif buttonName == 'pbFreeBallLeftBotYellow':
-        #     self.responseHandyRef.foulInfo.type = messages_pb2.FoulInfo.FoulType.FreeBallLeftBot
-        #     self.responseHandyRef.foulInfo.actorColor = messages_pb2.Color.Y
-        # elif buttonName == 'pbFreeBallRightBotYellow':
-        #     self.responseHandyRef.foulInfo.type = messages_pb2.FoulInfo.FoulType.FreeBallRightBot
-        #     self.responseHandyRef.foulInfo.actorColor = messages_pb2.Color.Y
-        #
-        # elif buttonName == 'pbPlayOn':
-        #     self.responseHandyRef.foulInfo.type = messages_pb2.FoulInfo.FoulType.PlayOn
-        # elif buttonName == 'pbStop':
-        #     self.responseHandyRef.foulInfo.phase = messages_pb2.FoulInfo.PhaseType.Stopped
-        # #TODO referee dowsnt provide halt we act like stop for now
-        # elif buttonName == 'pbHalt':
-        #     self.responseHandyRef.foulInfo.phase = messages_pb2.FoulInfo.PhaseType.Stopped
+        self.button_clicked.emit(buttonName)
+
 
 
 
@@ -138,6 +84,8 @@ class GameControllerWidget(QWidget):
         self.responseHandyRef.Clear()
         return tmp
 
+    def closeEvent(self, event):
+        self.widget_closed.emit()
 
 
 
