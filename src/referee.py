@@ -4,7 +4,7 @@ sys.path.insert(1, '../protoCompiled')
 from protoCompiled.SIM2REF import packet_pb2
 from src.firasimClient import FIRASimClient
 from src.firasimServer import FIRASimServer
-from src.common import WorldModel
+from src.common import WorldModel, GameState
 
 
 class Referee():
@@ -13,6 +13,7 @@ class Referee():
         self.firasimclient = FIRASimClient('127.0.0.1', 50051)
 
         self.worldmodel = WorldModel()
+        self.gamestate = GameState()
 
         self.firasimserver.start_receiveing(self.vision_detection)
 

@@ -1,4 +1,6 @@
 from protoCompiled.SIM2REF import packet_pb2
+from enum import Enum
+
 class Robot():
     def __init__(self):
         self.id = 0
@@ -45,4 +47,32 @@ class WorldModel():
             self.blues[i].x = enviroment.frame.robots_blue[i].x
             self.blues[i].y = enviroment.frame.robots_blue[i].y
             self.blues[i].orientation = enviroment.frame.robots_blue[i].orientation
+
+
+class GameStateEnum(Enum):
+    Halt = 1
+    PlayOn = 2
+    Stop = 3
+    KickOff = 4
+    Penalty = 5
+    FreeKick = 6
+    GoalKick = 7
+    FreeBallLeftTop = 8
+    FreeBallRightTop = 9
+    FreeBallLeftBot = 10
+    FreeBallRightBot = 11
+
+
+class ActorEnum(Enum):
+    Yellow = 1
+    Blue = 2
+    NoOne = 3
+
+
+class GameState():
+    def __init__(self):
+        self.state = GameStateEnum()
+        self.actor = ActorEnum()
+        self.state = GameStateEnum.Halt
+        self.actor = ActorEnum.NoOne
 
