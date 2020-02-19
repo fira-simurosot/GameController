@@ -4,7 +4,7 @@ sys.path.insert(1, '../protoCompiled')
 from protoCompiled.SIM2REF import packet_pb2
 from src.firasimClient import FIRASimClient
 from src.firasimServer import FIRASimServer
-from src.common import WorldModel, GameState
+from src.common import WorldModel, GameState, GameStateEnum, ActorEnum
 from multiprocessing import Process
 from PyQt5.QtWidgets import QApplication
 from PyQt5.QtCore import pyqtSlot
@@ -42,62 +42,64 @@ class Referee():
 
     def button_listener(self, buttonName):
         if buttonName == 'pbPlaceKickBlue':
-            self.responseHandyRef.foulInfo.type = messages_pb2.FoulInfo.FoulType.PlaceKick
-            self.responseHandyRef.foulInfo.actorColor = messages_pb2.Color.B
+            self.gamestate.state = GameStateEnum.KickOff
+            self.gamestate.actor = ActorEnum.Blue
         elif buttonName == 'pbPnaltyKickBlue':
-            self.responseHandyRef.foulInfo.type = messages_pb2.FoulInfo.FoulType.PenaltyKick
-            self.responseHandyRef.foulInfo.actorColor = messages_pb2.Color.B
+            self.gamestate.state = GameStateEnum.Penalty
+            self.gamestate.actor = ActorEnum.Blue
         elif buttonName == 'pbFreeKickBlue':
-            self.responseHandyRef.foulInfo.type = messages_pb2.FoulInfo.FoulType.FreeKick
-            self.responseHandyRef.foulInfo.actorColor = messages_pb2.Color.B
+            self.gamestate.state = GameStateEnum.FreeKick
+            self.gamestate.actor = ActorEnum.Blue
         elif buttonName == 'pbGoalKickBlue':
-            self.responseHandyRef.foulInfo.type = messages_pb2.FoulInfo.FoulType.GoalKick
-            self.responseHandyRef.foulInfo.actorColor = messages_pb2.Color.B
+            self.gamestate.state = GameStateEnum.GoalKick
+            self.gamestate.actor = ActorEnum.Blue
         elif buttonName == 'pbFreeBallLeftTopBlue':
-            self.responseHandyRef.foulInfo.type = messages_pb2.FoulInfo.FoulType.FreeBallLeftTop
-            self.responseHandyRef.foulInfo.actorColor = messages_pb2.Color.B
+            self.gamestate.state = GameStateEnum.FreeBallLeftTop
+            self.gamestate.actor = ActorEnum.Blue
         elif buttonName == 'pbFreeBallRightTopBlue':
-            self.responseHandyRef.foulInfo.type = messages_pb2.FoulInfo.FoulType.FreeBallRightTop
-            self.responseHandyRef.foulInfo.actorColor = messages_pb2.Color.B
+            self.gamestate.state = GameStateEnum.FreeBallRightTop
+            self.gamestate.actor = ActorEnum.Blue
         elif buttonName == 'pbFreeBallLeftBotBlue':
-            self.responseHandyRef.foulInfo.type = messages_pb2.FoulInfo.FoulType.FreeBallLeftBot
-            self.responseHandyRef.foulInfo.actorColor = messages_pb2.Color.B
+            self.gamestate.state = GameStateEnum.FreeBallLeftBot
+            self.gamestate.actor = ActorEnum.Blue
         elif buttonName == 'pbFreeBallRightBotBlue':
-            self.responseHandyRef.foulInfo.type = messages_pb2.FoulInfo.FoulType.FreeBallRightBot
-            self.responseHandyRef.foulInfo.actorColor = messages_pb2.Color.B
+            self.gamestate.state = GameStateEnum.FreeBallRightBot
+            self.gamestate.actor = ActorEnum.Blue
 
         elif buttonName == 'pbPlaceKickYellow':
-            self.responseHandyRef.foulInfo.type = messages_pb2.FoulInfo.FoulType.PlaceKick
-            self.responseHandyRef.foulInfo.actorColor = messages_pb2.Color.Y
+            self.gamestate.state = GameStateEnum.KickOff
+            self.gamestate.actor = ActorEnum.Yellow
         elif buttonName == 'pbPnaltyKickYellow':
-            self.responseHandyRef.foulInfo.type = messages_pb2.FoulInfo.FoulType.PenaltyKick
-            self.responseHandyRef.foulInfo.actorColor = messages_pb2.Color.Y
+            self.gamestate.state = GameStateEnum.Penalty
+            self.gamestate.actor = ActorEnum.Yellow
         elif buttonName == 'pbFreeKickYellow':
-            self.responseHandyRef.foulInfo.type = messages_pb2.FoulInfo.FoulType.FreeKick
-            self.responseHandyRef.foulInfo.actorColor = messages_pb2.Color.Y
+            self.gamestate.state = GameStateEnum.FreeKick
+            self.gamestate.actor = ActorEnum.Yellow
         elif buttonName == 'pbGoalKickYellow':
-            self.responseHandyRef.foulInfo.type = messages_pb2.FoulInfo.FoulType.GoalKick
-            self.responseHandyRef.foulInfo.actorColor = messages_pb2.Color.Y
+            self.gamestate.state = GameStateEnum.GoalKick
+            self.gamestate.actor = ActorEnum.Yellow
         elif buttonName == 'pbFreeBallLeftTopYellow':
-            self.responseHandyRef.foulInfo.type = messages_pb2.FoulInfo.FoulType.FreeBallLeftTop
-            self.responseHandyRef.foulInfo.actorColor = messages_pb2.Color.Y
+            self.gamestate.state = GameStateEnum.FreeBallLeftTop
+            self.gamestate.actor = ActorEnum.Yellow
         elif buttonName == 'pbFreeBallRightTopYellow':
-            self.responseHandyRef.foulInfo.type = messages_pb2.FoulInfo.FoulType.FreeBallRightTop
-            self.responseHandyRef.foulInfo.actorColor = messages_pb2.Color.Y
+            self.gamestate.state = GameStateEnum.FreeBallRightTop
+            self.gamestate.actor = ActorEnum.Yellow
         elif buttonName == 'pbFreeBallLeftBotYellow':
-            self.responseHandyRef.foulInfo.type = messages_pb2.FoulInfo.FoulType.FreeBallLeftBot
-            self.responseHandyRef.foulInfo.actorColor = messages_pb2.Color.Y
+            self.gamestate.state = GameStateEnum.FreeBallLeftBot
+            self.gamestate.actor = ActorEnum.Yellow
         elif buttonName == 'pbFreeBallRightBotYellow':
-            self.responseHandyRef.foulInfo.type = messages_pb2.FoulInfo.FoulType.FreeBallRightBot
-            self.responseHandyRef.foulInfo.actorColor = messages_pb2.Color.Y
+            self.gamestate.state = GameStateEnum.FreeBallRightBot
+            self.gamestate.actor = ActorEnum.Yellow
 
         elif buttonName == 'pbPlayOn':
-            self.responseHandyRef.foulInfo.type = messages_pb2.FoulInfo.FoulType.PlayOn
+            self.gamestate.state = GameStateEnum.PlayOn
+            self.gamestate.actor = ActorEnum.NoOne
         elif buttonName == 'pbStop':
-            self.responseHandyRef.foulInfo.phase = messages_pb2.FoulInfo.PhaseType.Stopped
-        #TODO referee dowsnt provide halt we act like stop for now
+            self.gamestate.state = GameStateEnum.Stop
+            self.gamestate.actor = ActorEnum.NoOne
         elif buttonName == 'pbHalt':
-            self.responseHandyRef.foulInfo.phase = messages_pb2.FoulInfo.PhaseType.Stopped
+            self.gamestate.state = GameStateEnum.Halt
+            self.gamestate.actor = ActorEnum.NoOne
 
 
 
