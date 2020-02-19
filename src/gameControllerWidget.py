@@ -56,8 +56,9 @@ class GameControllerWidget(QWidget):
     def btnListener(self, buttonName):
         self.button_clicked.emit(buttonName)
 
-
-
+    def set_teamnames(self, yellow_name, blue_name):
+        self.labelTeamNameYellow.setText(yellow_name)
+        self.labelTeamNameBlue.setText(blue_name)
 
     def startTimer(self):
         self.timer.start(1000)
