@@ -24,7 +24,7 @@ class TeamClient():
         try:
             response = self.stub.Register(environment)
         except:
-            response = None
+            response = messages_pb2.TeamName()
         return response
 
     def call_RunStrategy(self, frame, foulInfo):
@@ -32,7 +32,7 @@ class TeamClient():
         try:
             response = self.stub.RunStrategy(environment)
         except:
-            response = None
+            response = messages_pb2.Command()
         return response
 
     def call_SetBall(self, frame, foulInfo):
@@ -40,7 +40,7 @@ class TeamClient():
         try:
             response = self.stub.SetBall(environment)
         except:
-            response = None
+            response = common_pb2.Ball()
         return response
 
     def call_SetFormerRobots(self, frame, foulInfo):
@@ -48,7 +48,7 @@ class TeamClient():
         try:
             response = self.stub.SetFormerRobots(environment)
         except:
-            response = None
+            response = messages_pb2.Robots()
         return response
 
     def call_SetLaterRobots(self, frame, foulInfo):
@@ -56,7 +56,7 @@ class TeamClient():
         try:
             response = self.stub.SetLaterRobots(environment)
         except:
-            response = None
+            response = messages_pb2.Robots()
         return response
 
 
