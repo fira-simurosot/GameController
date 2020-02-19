@@ -6,10 +6,10 @@ from protoCompiled import common_pb2
 from protoCompiled.REF2CLI import messages_pb2, service_pb2_grpc, service_pb2
 from src.firasimClient import FIRASimClient
 from src.firasimServer import FIRASimServer
-from src.common import WorldModel, GameState, GameStateEnum, ActorEnum
+from src.common import WorldModel, GameState, GameStateEnum, ActorEnum, Converter
 from multiprocessing import Process
 from PyQt5.QtWidgets import QApplication
-from PyQt5.QtCore import pyqtSlot
+from PyQt5.QtCore import pyqtSlot, QTimer, QObject
 from src.gameControllerWidget import GameControllerWidget
 from src.teamClient import TeamClient
 
@@ -20,16 +20,18 @@ class Referee():
         self.yellowClient = TeamClient('127.0.0.1', 50053)
         self.blueClient = TeamClient('127.0.0.1', 50052)
 
-
+        self.firasimserver.set_function(self.vision_detection)
         self.worldmodel = WorldModel()
         self.gamestate = GameState()
+        self.converter = Converter()
         self.app = None
         self.gamecontrollerWidget = None
 
-
-        self.p = Process(target=self.firasimserver.start_receiveing, args=(self.vision_detection,))
-        self.p.start()
         self.createGUI()
+        self.steper = QTimer()
+        self.steper.timeout.connect(self.firasimserver.receive)
+        self.steper.start(16.6)
+
         self.register_teams()
         sys.exit(self.app.exec_())
 
@@ -39,7 +41,12 @@ class Referee():
         # print(data)
         environment = packet_pb2.Environment()
         environment.ParseFromString(data)
-        self.worldmodel.update_worldmodel(environment)
+        # self.worldmodel.update_worldmodel(environment)
+        frame = common_pb2.Frame()
+        frame.CopyFrom(environment.frame)
+        foulInfo = messages_pb2.FoulInfo()
+        if self.gamestate.state == GameStateEnum.PlayOn:
+            self.runStrategy_teams(frame, foulInfo)
 
     def createGUI(self):
         self.app = QApplication(sys.argv)
@@ -48,7 +55,7 @@ class Referee():
         self.gamecontrollerWidget.widget_closed.connect(self.widget_closed)
 
     def widget_closed(self):
-        self.p.kill()
+        pass
 
     def button_listener(self, buttonName):
         if buttonName == 'pbPlaceKickBlue':
@@ -115,16 +122,16 @@ class Referee():
         frame = common_pb2.Frame()
         foulInfo = messages_pb2.FoulInfo()
         yellow_name = self.yellowClient.call_Register(frame, foulInfo)
-        if yellow_name == None:
-            yellow_name = 'not registered'
-        else:
-            yellow_name = yellow_name.name
         blue_name = self.blueClient.call_Register(frame, foulInfo)
-        if blue_name == None:
-            blue_name = 'not registered'
-        else:
-            blue_name = blue_name.name
-        self.gamecontrollerWidget.set_teamnames(yellow_name, blue_name)
+        self.gamecontrollerWidget.set_teamnames(yellow_name.name, blue_name.name)
+
+    def runStrategy_teams(self, frame, foulInfo):
+        yellowCommand = self.yellowClient.call_RunStrategy(frame, foulInfo)
+        BlueCommand = self.blueClient.call_RunStrategy(frame, foulInfo)
+        yelbot = self.converter.convert_protocommand_to_Robot(yellowCommand, True)
+        blubot = self.converter.convert_protocommand_to_Robot(BlueCommand, False)
+        self.firasimclient.send_robot_command(yelbot, blubot)
+
 
 if __name__ == "__main__":
     referee = Referee()

@@ -13,11 +13,20 @@ class FIRASimServer():
         self.sock = socket.socket(socket.AF_INET,  # Internet
                                   socket.SOCK_DGRAM)  # UDP
         self.sock.bind((self.ip, self.port))
+        self.vision_detection_function = None
 
-    def start_receiveing(self, function):
+    def set_function(self, function):
+        self.vision_detection_function = function
+
+    def start_receiveing(self):
         while True:
             data, addr = self.sock.recvfrom(1024)
-            function(data)
+            self.vision_detection_function(data)
+
+
+    def receive(self):
+        data, addr = self.sock.recvfrom(1024)
+        self.vision_detection_function(data)
 
 
 if __name__ == "__main__":

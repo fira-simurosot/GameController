@@ -31,7 +31,6 @@ class FIRASimClient():
             robot_command = commands.robot_commands.add()
             robot_command.id = robot.id
             robot_command.yellowteam = robot.isYellow
-            print(robot_command.yellowteam)
             robot_command.wheel_left = robot.wheel_left
             robot_command.wheel_right = robot.wheel_right
 
