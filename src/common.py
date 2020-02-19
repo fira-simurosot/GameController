@@ -71,8 +71,6 @@ class ActorEnum(Enum):
 
 class GameState():
     def __init__(self):
-        self.state = GameStateEnum()
-        self.actor = ActorEnum()
         self.state = GameStateEnum.Halt
         self.actor = ActorEnum.NoOne
 
