@@ -51,7 +51,10 @@ class GameControllerWidget(QWidget):
         self.pbPlayOn.clicked.connect(partial(self.btnListener, "pbPlayOn"))
         self.pbStop.clicked.connect(partial(self.btnListener, "pbStop"))
         self.pbHalt.clicked.connect(partial(self.btnListener, "pbHalt"))
-
+        self.pbfirstHalf.clicked.connect(partial(self.btnListener, "pbfirstHalf"))
+        self.pbsecondHalf.clicked.connect(partial(self.btnListener, "pbsecondHalf"))
+        self.pbpenalty.clicked.connect(partial(self.btnListener, "pbpenalty"))
+        self.pbpause.clicked.connect(partial(self.btnListener, "pbpause"))
 
     def btnListener(self, buttonName):
         self.button_clicked.emit(buttonName)
@@ -60,7 +63,10 @@ class GameControllerWidget(QWidget):
         self.labelTeamNameYellow.setText(yellow_name)
         self.labelTeamNameBlue.setText(blue_name)
 
-    def startTimer(self):
+    def start_timer(self, clean):
+        if clean:
+            self.min = 0
+            self.sec = 0
         self.timer.start(1000)
 
     def handleTimer(self):
@@ -76,14 +82,6 @@ class GameControllerWidget(QWidget):
         self.labelsteper.setText('step ' + str(self.step) + ' / 18000')
         self.labelScoreBlue.setText(str(scoreBlue))
         self.labelScoreYellow.setText(str(scoreYellow))
-
-        #create response
-        tmp = messages_pb2.HandyRef()
-        tmp.CopyFrom(self.responseHandyRef)
-        if self.checkIgnore.isChecked():
-            tmp.isOwerWriting = True
-        self.responseHandyRef.Clear()
-        return tmp
 
     def closeEvent(self, event):
         self.widget_closed.emit()

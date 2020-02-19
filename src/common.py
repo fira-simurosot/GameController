@@ -64,6 +64,13 @@ class GameStateEnum(Enum):
     FreeBallRightBot = 11
 
 
+class GamePhaseEnum(Enum):
+    FirstHalf = 1
+    SecondHalf = 2
+    Penalty = 3
+    Pause = 4
+
+
 class ActorEnum(Enum):
     Yellow = 1
     Blue = 2
@@ -74,6 +81,7 @@ class GameState():
     def __init__(self):
         self.state = GameStateEnum.Halt
         self.actor = ActorEnum.NoOne
+        self.phase = GamePhaseEnum.Pause
 
     def need_robot_placement(self):
         return self.state == GameStateEnum.KickOff or self.state == GameStateEnum.Penalty or self.state == GameStateEnum.FreeKick or self.state == GameStateEnum.GoalKick or self.state == GameStateEnum.FreeBallLeftTop or self.state == GameStateEnum.FreeBallRightTop or self.state == GameStateEnum.FreeBallLeftBot or self.state == GameStateEnum.FreeBallRightBot

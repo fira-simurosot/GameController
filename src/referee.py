@@ -6,7 +6,7 @@ from protoCompiled import common_pb2
 from protoCompiled.REF2CLI import messages_pb2, service_pb2_grpc, service_pb2
 from src.firasimClient import FIRASimClient
 from src.firasimServer import FIRASimServer
-from src.common import WorldModel, GameState, GameStateEnum, ActorEnum, Converter
+from src.common import WorldModel, GameState, GameStateEnum, ActorEnum, GamePhaseEnum, Converter
 from multiprocessing import Process
 from PyQt5.QtWidgets import QApplication
 from PyQt5.QtCore import pyqtSlot, QTimer, QObject
@@ -39,6 +39,9 @@ class Referee():
 
     def vision_detection(self, data):
         # print(data)
+        if self.gamestate.phase != GamePhaseEnum.Pause:
+            self.gamecontrollerWidget.updateStats(0, 0)
+
         environment = packet_pb2.Environment()
         environment.ParseFromString(data)
         # self.worldmodel.update_worldmodel(environment)
@@ -122,6 +125,24 @@ class Referee():
         elif buttonName == 'pbHalt':
             self.gamestate.state = GameStateEnum.Halt
             self.gamestate.actor = ActorEnum.NoOne
+        elif buttonName == 'pbfirstHalf':
+            self.gamestate.state = GameStateEnum.Stop
+            self.gamestate.actor = ActorEnum.NoOne
+            self.gamestate.phase = GamePhaseEnum.FirstHalf
+            self.gamecontrollerWidget.start_timer(True)
+        elif buttonName == 'pbsecondHalf':
+            self.gamestate.state = GameStateEnum.Stop
+            self.gamestate.actor = ActorEnum.NoOne
+            self.gamestate.phase = GamePhaseEnum.SecondHalf
+            self.gamecontrollerWidget.start_timer(True)
+        elif buttonName == 'pbpenalty':
+            self.gamestate.state = GameStateEnum.Stop
+            self.gamestate.actor = ActorEnum.NoOne
+            self.gamestate.phase = GamePhaseEnum.Penalty
+        elif buttonName == 'pbpause':
+            self.gamestate.state = GameStateEnum.Stop
+            self.gamestate.actor = ActorEnum.NoOne
+            self.gamestate.phase = GamePhaseEnum.Pause
 
     def register_teams(self):
         frame = common_pb2.Frame()
