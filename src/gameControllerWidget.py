@@ -54,7 +54,6 @@ class GameControllerWidget(QWidget):
         self.pbfirstHalf.clicked.connect(partial(self.btnListener, "pbfirstHalf"))
         self.pbsecondHalf.clicked.connect(partial(self.btnListener, "pbsecondHalf"))
         self.pbpenalty.clicked.connect(partial(self.btnListener, "pbpenalty"))
-        self.pbpause.clicked.connect(partial(self.btnListener, "pbpause"))
 
     def btnListener(self, buttonName):
         self.button_clicked.emit(buttonName)
@@ -67,6 +66,7 @@ class GameControllerWidget(QWidget):
         if clean:
             self.min = 0
             self.sec = 0
+            self.step = 0
         self.timer.start(1000)
 
     def handleTimer(self):
@@ -80,6 +80,8 @@ class GameControllerWidget(QWidget):
         #handle request
         self.step += 1
         self.labelsteper.setText('step ' + str(self.step) + ' / 18000')
+        if self.step > 18000:
+            self.labelsteper.setStyleSheet('QLabel{color: red}')
         self.labelScoreBlue.setText(str(scoreBlue))
         self.labelScoreYellow.setText(str(scoreYellow))
 

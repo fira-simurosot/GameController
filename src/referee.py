@@ -15,6 +15,8 @@ from src.teamClient import TeamClient
 
 class Referee():
     def __init__(self):
+        self.app = QApplication(sys.argv)
+
         self.firasimserver = FIRASimServer('127.0.0.1', 50055)
         self.firasimclient = FIRASimClient('127.0.0.1', 50051)
         self.yellowClient = TeamClient('127.0.0.1', 50053)
@@ -24,13 +26,9 @@ class Referee():
         self.worldmodel = WorldModel()
         self.gamestate = GameState()
         self.converter = Converter()
-        self.app = None
         self.gamecontrollerWidget = None
 
         self.createGUI()
-        self.steper = QTimer()
-        self.steper.timeout.connect(self.firasimserver.receive)
-        self.steper.start(16.6)
 
         self.register_teams()
         sys.exit(self.app.exec_())
@@ -38,26 +36,17 @@ class Referee():
 
 
     def vision_detection(self, data):
-        # print(data)
-        if self.gamestate.phase != GamePhaseEnum.Pause:
-            self.gamecontrollerWidget.updateStats(0, 0)
+        print(data)
 
-        environment = packet_pb2.Environment()
-        environment.ParseFromString(data)
-        # self.worldmodel.update_worldmodel(environment)
-        frame = common_pb2.Frame()
-        frame.CopyFrom(environment.frame)
-        foulInfo = messages_pb2.FoulInfo()
-        if self.gamestate.state == GameStateEnum.PlayOn:
-            self.runStrategy_teams(frame, foulInfo)
-        elif self.gamestate.need_robot_placement():
-            if self.gamestate.need_ball_placement():
-                self.ballPlacement_teams(frame, foulInfo)
-            self.robotPlacement_teams(frame, foulInfo)
+        # environment = packet_pb2.Environment()
+        # environment.ParseFromString(data)
+        # # self.worldmodel.update_worldmodel(environment)
+        # (foulinfo_yellow, foulinfo_blue) = self.generate_foulinfo()
+        # (foulinfo_yellow, foulinfo_blue) = self.generate_foulinfo()
+
 
 
     def createGUI(self):
-        self.app = QApplication(sys.argv)
         self.gamecontrollerWidget = GameControllerWidget()
         self.gamecontrollerWidget.button_clicked.connect(self.button_listener)
         self.gamecontrollerWidget.widget_closed.connect(self.widget_closed)
@@ -139,10 +128,50 @@ class Referee():
             self.gamestate.state = GameStateEnum.Stop
             self.gamestate.actor = ActorEnum.NoOne
             self.gamestate.phase = GamePhaseEnum.Penalty
-        elif buttonName == 'pbpause':
-            self.gamestate.state = GameStateEnum.Stop
-            self.gamestate.actor = ActorEnum.NoOne
-            self.gamestate.phase = GamePhaseEnum.Pause
+
+    def generate_foulinfo(self):
+        foulinfo_yellow = messages_pb2.FoulInfo()
+        if self.gamestate.phase == GamePhaseEnum.FirstHalf:
+            foulinfo_yellow.phase = messages_pb2.FoulInfo.PhaseType.FirstHalf
+        elif self.gamestate.phase == GamePhaseEnum.SecondHalf:
+            foulinfo_yellow.phase = messages_pb2.FoulInfo.PhaseType.SecondHalf
+        elif self.gamestate.phase == GamePhaseEnum.Penalty:
+            foulinfo_yellow.phase = messages_pb2.FoulInfo.PhaseType.PenaltyShootout
+        elif self.gamestate.phase == GamePhaseEnum.Pause or self.gamestate.state == GameStateEnum.Stop:
+            foulinfo_yellow.phase = messages_pb2.FoulInfo.PhaseType.Stopped
+
+        if self.gamestate.state == GameStateEnum.PlayOn:
+            foulinfo_yellow.type = messages_pb2.FoulInfo.FoulType.PlayOn
+        elif self.gamestate.state == GameStateEnum.KickOff:
+            foulinfo_yellow.type = messages_pb2.FoulInfo.FoulType.PlaceKick
+        elif self.gamestate.state == GameStateEnum.Penalty:
+            foulinfo_yellow.type = messages_pb2.FoulInfo.FoulType.PenaltyKick
+        elif self.gamestate.state == GameStateEnum.FreeKick:
+            foulinfo_yellow.type = messages_pb2.FoulInfo.FoulType.FreeKick
+        elif self.gamestate.state == GameStateEnum.GoalKick:
+            foulinfo_yellow.type = messages_pb2.FoulInfo.FoulType.GoalKick
+        elif self.gamestate.state == GameStateEnum.FreeBallLeftTop:
+            foulinfo_yellow.type = messages_pb2.FoulInfo.FoulType.FreeBallLeftTop
+        elif self.gamestate.state == GameStateEnum.FreeBallRightTop:
+            foulinfo_yellow.type = messages_pb2.FoulInfo.FoulType.FreeBallRightTop
+        elif self.gamestate.state == GameStateEnum.FreeBallLeftBot:
+            foulinfo_yellow.type = messages_pb2.FoulInfo.FoulType.FreeBallLeftBot
+        elif self.gamestate.state == GameStateEnum.FreeBallRightBot:
+            foulinfo_yellow.type = messages_pb2.FoulInfo.FoulType.FreeBallRightBot
+
+        if self.gamestate.actor == ActorEnum.Yellow:
+            foulinfo_yellow.actor = messages_pb2.Side.Self
+        else:
+            foulinfo_yellow.actor = messages_pb2.Side.Opponent
+
+        foulinfo_blue = messages_pb2.FoulInfo()
+        foulinfo_blue.CopyFrom(foulinfo_yellow)
+        if self.gamestate.actor == ActorEnum.Yellow:
+            foulinfo_blue.actor = messages_pb2.Side.Opponent
+        else:
+            foulinfo_yellow.actor = messages_pb2.Side.Self
+
+        return (foulinfo_yellow, foulinfo_blue)
 
     def register_teams(self):
         frame = common_pb2.Frame()

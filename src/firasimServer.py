@@ -4,29 +4,26 @@ sys.path.insert(1, '../protoCompiled')
 import socket
 from protoCompiled.SIM2REF import packet_pb2
 from src.common import WorldModel
+from PyQt5.QtNetwork import QUdpSocket
+
 
 class FIRASimServer():
     def __init__(self, ip, port):
         self.ip = ip
         self.port = port
 
-        self.sock = socket.socket(socket.AF_INET,  # Internet
-                                  socket.SOCK_DGRAM)  # UDP
-        self.sock.bind((self.ip, self.port))
-        self.vision_detection_function = None
+        self.udpSocket = QUdpSocket()
+        self.udpSocket.bind(self.port)
+        self.udpSocket.readyRead.connect(self.handle_incoming)
 
     def set_function(self, function):
         self.vision_detection_function = function
 
-    def start_receiveing(self):
-        while True:
-            data, addr = self.sock.recvfrom(1024)
-            self.vision_detection_function(data)
+    def handle_incoming(self):
+        while self.udpSocket.hasPendingDatagrams():
+            datagram, host, port = self.udpSocket.readDatagram(self.udpSocket.pendingDatagramSize())
+        self.vision_detection_function(datagram)
 
-
-    def receive(self):
-        data, addr = self.sock.recvfrom(1024)
-        self.vision_detection_function(data)
 
 
 if __name__ == "__main__":
@@ -36,4 +33,4 @@ if __name__ == "__main__":
         worldmodel = WorldModel()
         worldmodel.update_worldmodel(enviroment)
     server = FIRASimServer('127.0.0.1', 50054)
-    server.start_receiveing(func)
+    server.set_function(func)
