@@ -21,18 +21,20 @@ class FIRASimClient():
 
     def send_robot_command(self, robotsYellow, robotsBlue):
         commands = command_pb2.Commands()
-        for robot in robotsYellow:
-            robot_command = commands.robot_commands.add()
-            robot_command.id = robot.id
-            robot_command.yellowteam = robot.isYellow
-            robot_command.wheel_left = robot.wheel_left
-            robot_command.wheel_right = robot.wheel_right
-        for robot in robotsBlue:
-            robot_command = commands.robot_commands.add()
-            robot_command.id = robot.id
-            robot_command.yellowteam = robot.isYellow
-            robot_command.wheel_left = robot.wheel_left
-            robot_command.wheel_right = robot.wheel_right
+        if robotsYellow != None:
+            for robot in robotsYellow:
+                robot_command = commands.robot_commands.add()
+                robot_command.id = robot.id
+                robot_command.yellowteam = robot.isYellow
+                robot_command.wheel_left = robot.wheel_left
+                robot_command.wheel_right = robot.wheel_right
+        if robotsBlue != None:
+            for robot in robotsBlue:
+                robot_command = commands.robot_commands.add()
+                robot_command.id = robot.id
+                robot_command.yellowteam = robot.isYellow
+                robot_command.wheel_left = robot.wheel_left
+                robot_command.wheel_right = robot.wheel_right
 
         packet = packet_pb2.Packet()
         packet.cmd.CopyFrom(commands)
@@ -42,23 +44,24 @@ class FIRASimClient():
 
     def send_robot_replacement(self, robotsYellow, robotsBlue):
         replacement = replacement_pb2.Replacement()
-        for myrobot in robotsYellow:
-            robot = replacement.robots.add()
-            robot.position.robot_id = myrobot.id
-            robot.position.x = myrobot.x
-            robot.position.y = myrobot.y
-            robot.position.orientation = myrobot.orientation
-            robot.yellowteam = True
-            robot.turnon = True
-
-        for myrobot in robotsBlue:
-            robot = replacement.robots.add()
-            robot.position.robot_id = myrobot.id
-            robot.position.x = myrobot.x
-            robot.position.y = myrobot.y
-            robot.position.orientation = myrobot.orientation
-            robot.yellowteam = False
-            robot.turnon = True
+        if robotsYellow != None:
+            for myrobot in robotsYellow:
+                robot = replacement.robots.add()
+                robot.position.robot_id = myrobot.id
+                robot.position.x = myrobot.x
+                robot.position.y = myrobot.y
+                robot.position.orientation = myrobot.orientation
+                robot.yellowteam = True
+                robot.turnon = True
+        if robotsBlue != None:
+            for myrobot in robotsBlue:
+                robot = replacement.robots.add()
+                robot.position.robot_id = myrobot.id
+                robot.position.x = myrobot.x
+                robot.position.y = myrobot.y
+                robot.position.orientation = myrobot.orientation
+                robot.yellowteam = False
+                robot.turnon = True
 
         packet = packet_pb2.Packet()
         packet.replace.CopyFrom(replacement)

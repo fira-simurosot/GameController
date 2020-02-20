@@ -1,5 +1,6 @@
 from protoCompiled import common_pb2
 from protoCompiled.SIM2REF import packet_pb2, replacement_pb2, command_pb2
+from protoCompiled.REF2CLI import messages_pb2
 from enum import Enum
 
 class Robot():
@@ -50,27 +51,6 @@ class WorldModel():
             self.blues[i].orientation = enviroment.frame.robots_blue[i].orientation
 
 
-class GameStateEnum(Enum):
-    Halt = 1
-    PlayOn = 2
-    Stop = 3
-    KickOff = 4
-    Penalty = 5
-    FreeKick = 6
-    GoalKick = 7
-    FreeBallLeftTop = 8
-    FreeBallRightTop = 9
-    FreeBallLeftBot = 10
-    FreeBallRightBot = 11
-
-
-class GamePhaseEnum(Enum):
-    FirstHalf = 1
-    SecondHalf = 2
-    Penalty = 3
-    Pause = 4
-
-
 class ActorEnum(Enum):
     Yellow = 1
     Blue = 2
@@ -79,16 +59,18 @@ class ActorEnum(Enum):
 
 class GameState():
     def __init__(self):
-        self.state = GameStateEnum.Halt
+        self.state = messages_pb2.FoulInfo.FoulType.PlaceKick
         self.actor = ActorEnum.NoOne
-        self.phase = GamePhaseEnum.Pause
+        self.phase = messages_pb2.FoulInfo.PhaseType.FirstHalf
 
     def need_robot_placement(self):
-        return self.state == GameStateEnum.KickOff or self.state == GameStateEnum.Penalty or self.state == GameStateEnum.FreeKick or self.state == GameStateEnum.GoalKick or self.state == GameStateEnum.FreeBallLeftTop or self.state == GameStateEnum.FreeBallRightTop or self.state == GameStateEnum.FreeBallLeftBot or self.state == GameStateEnum.FreeBallRightBot
+        return self.state != messages_pb2.FoulInfo.FoulType.PlayOn
 
     def need_ball_placement(self):
-        return self.state == GameStateEnum.GoalKick
+        return self.state == messages_pb2.FoulInfo.FoulType.GoalKick
 
+    def is_play_on(self):
+        return self.state == messages_pb2.FoulInfo.FoulType.PlayOn
 
 class Converter():
     def __init__(self):
