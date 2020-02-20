@@ -19,15 +19,15 @@ class TeamClient():
         environment.foulInfo.CopyFrom(foulInfo)
         return environment
 
-    def call_Register(self, frame, foulInfo):
-        environment = self.create_environment(frame, foulInfo)
+    def call_Register(self, teaminfo):
+        # environment = self.create_environment(frame, foulInfo)
         try:
-            response = self.stub.Register(environment)
+            response = self.stub.Register(teaminfo)
         except:
             response = messages_pb2.TeamName()
         return response
 
-    def call_RunStrategy(self, frame, foulInfo):
+    def call_RunStrategy(self, frame = common_pb2.Frame(), foulInfo = messages_pb2.FoulInfo()):
         environment = self.create_environment(frame, foulInfo)
         try:
             response = self.stub.RunStrategy(environment)
@@ -35,7 +35,7 @@ class TeamClient():
             response = messages_pb2.Command()
         return response
 
-    def call_SetBall(self, frame, foulInfo):
+    def call_SetBall(self, frame = common_pb2.Frame(), foulInfo = messages_pb2.FoulInfo()):
         environment = self.create_environment(frame, foulInfo)
         try:
             response = self.stub.SetBall(environment)
@@ -43,7 +43,7 @@ class TeamClient():
             response = common_pb2.Ball()
         return response
 
-    def call_SetFormerRobots(self, frame, foulInfo):
+    def call_SetFormerRobots(self, frame = common_pb2.Frame(), foulInfo = messages_pb2.FoulInfo()):
         environment = self.create_environment(frame, foulInfo)
         try:
             response = self.stub.SetFormerRobots(environment)
@@ -51,7 +51,7 @@ class TeamClient():
             response = messages_pb2.Robots()
         return response
 
-    def call_SetLaterRobots(self, frame, foulInfo):
+    def call_SetLaterRobots(self, frame = common_pb2.Frame(), foulInfo = messages_pb2.FoulInfo()):
         environment = self.create_environment(frame, foulInfo)
         try:
             response = self.stub.SetLaterRobots(environment)
@@ -67,4 +67,4 @@ if __name__ == "__main__":
     teamClient = TeamClient('127.0.0.1', 50052)
     frame = common_pb2.Frame()
     foulInfo = messages_pb2.FoulInfo()
-    print(teamClient.call_Register(frame, foulInfo))
+    print(teamClient.call_SetFormerRobots())

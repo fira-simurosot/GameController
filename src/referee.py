@@ -6,14 +6,14 @@ from protoCompiled import common_pb2
 from protoCompiled.REF2CLI import messages_pb2, service_pb2_grpc, service_pb2
 from src.firasimClient import FIRASimClient
 from src.firasimServer import FIRASimServer
+from src.teamClient import TeamClient
+from src.threadClient import ThreadClient, WhatToCallEnum
 from src.common import WorldModel, GameState, ActorEnum, Converter
 from multiprocessing import Process
 from PyQt5.QtWidgets import QApplication
 from PyQt5.QtCore import pyqtSlot, QTimer, QObject
 from src.gameControllerWidget import GameControllerWidget
-from src.myThread import MyThread, WhatToCallEnum
-from src.teamClient import TeamClient
-import math
+import math, time
 
 
 class Referee():
@@ -22,8 +22,14 @@ class Referee():
 
         self.firasimserver = FIRASimServer('127.0.0.1', 50055)
         self.firasimclient = FIRASimClient('127.0.0.1', 50051)
-        self.yellowClient = TeamClient('127.0.0.1', 50053)
-        self.blueClient = TeamClient('127.0.0.1', 50052)
+        self.yellowThread = ThreadClient('127.0.0.1', 50053, True, self.firasimclient)
+        self.blueThread = ThreadClient('127.0.0.1', 50052, False, self.firasimclient)
+
+        self.yellowThread.set_arguments(WhatToCallEnum.Register)
+        self.blueThread.set_arguments(WhatToCallEnum.Register)
+        self.yellowThread.wait()
+        self.blueThread.wait()
+
 
         self.firasimserver.set_function(self.vision_detection)
         self.worldmodel = WorldModel()
@@ -31,8 +37,8 @@ class Referee():
         self.converter = Converter()
         self.gamecontrollerWidget = None
         self.createGUI()
+        self.gamecontrollerWidget.set_teamnames(self.yellowThread.teamName, self.blueThread.teamName)
 
-        self.register_teams()
         sys.exit(self.app.exec_())
 
 
@@ -44,6 +50,18 @@ class Referee():
 
         (foulinfo_yellow, foulinfo_blue) = self.generate_foulinfo()
         (frame_yellow, frame_blue) = self.generate_frame(environment)
+
+        if self.gamestate.need_ball_placement():
+            if self.gamestate.actor == ActorEnum.Yellow:
+                self.yellowThread.set_arguments(WhatToCallEnum.SetBall, frame_yellow, foulinfo_yellow)
+            else:
+                self.blueThread.set_arguments(WhatToCallEnum.SetBall, frame_blue, foulinfo_blue)
+        elif self.gamestate.need_robot_placement():
+            self.yellowThread.set_arguments(WhatToCallEnum.SetFormerRobots, frame_yellow, foulinfo_yellow)
+            self.blueThread.set_arguments(WhatToCallEnum.SetLaterRobots, frame_blue, foulinfo_blue)
+        elif self.gamestate.is_play_on():
+            self.yellowThread.set_arguments(WhatToCallEnum.RunStrategy, frame_yellow, foulinfo_yellow)
+            self.blueThread.set_arguments(WhatToCallEnum.RunStrategy, frame_blue, foulinfo_blue)
 
 
     def createGUI(self):
@@ -125,16 +143,6 @@ class Referee():
             robot.orientation = math.pi - robot.orientation
 
         return frame_yellow, frame_blue
-
-
-
-
-    def register_teams(self):
-        frame = common_pb2.Frame()
-        foulInfo = messages_pb2.FoulInfo()
-        yellow_name = self.yellowClient.call_Register(frame, foulInfo)
-        blue_name = self.blueClient.call_Register(frame, foulInfo)
-        self.gamecontrollerWidget.set_teamnames(yellow_name.name, blue_name.name)
 
     def runStrategy_teams(self, frame, foulInfo):
         yellowCommand = self.yellowClient.call_RunStrategy(frame, foulInfo)

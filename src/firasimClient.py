@@ -19,22 +19,20 @@ class FIRASimClient():
         # sock.sendto(MESSAGE, (UDP_IP, UDP_PORT))
 
 
-    def send_robot_command(self, robotsYellow, robotsBlue):
+    def send_robot_command(self, robotsYellow = [], robotsBlue = []):
         commands = command_pb2.Commands()
-        if robotsYellow != None:
-            for robot in robotsYellow:
-                robot_command = commands.robot_commands.add()
-                robot_command.id = robot.id
-                robot_command.yellowteam = robot.isYellow
-                robot_command.wheel_left = robot.wheel_left
-                robot_command.wheel_right = robot.wheel_right
-        if robotsBlue != None:
-            for robot in robotsBlue:
-                robot_command = commands.robot_commands.add()
-                robot_command.id = robot.id
-                robot_command.yellowteam = robot.isYellow
-                robot_command.wheel_left = robot.wheel_left
-                robot_command.wheel_right = robot.wheel_right
+        for robot in robotsYellow:
+            robot_command = commands.robot_commands.add()
+            robot_command.id = robot.id
+            robot_command.yellowteam = robot.isYellow
+            robot_command.wheel_left = robot.wheel_left
+            robot_command.wheel_right = robot.wheel_right
+        for robot in robotsBlue:
+            robot_command = commands.robot_commands.add()
+            robot_command.id = robot.id
+            robot_command.yellowteam = robot.isYellow
+            robot_command.wheel_left = robot.wheel_left
+            robot_command.wheel_right = robot.wheel_right
 
         packet = packet_pb2.Packet()
         packet.cmd.CopyFrom(commands)
@@ -42,26 +40,24 @@ class FIRASimClient():
         self.sock.sendto(packet.SerializeToString(), (self.ip, self.port))
 
 
-    def send_robot_replacement(self, robotsYellow, robotsBlue):
+    def send_robot_replacement(self, robotsYellow = [], robotsBlue = []):
         replacement = replacement_pb2.Replacement()
-        if robotsYellow != None:
-            for myrobot in robotsYellow:
-                robot = replacement.robots.add()
-                robot.position.robot_id = myrobot.id
-                robot.position.x = myrobot.x
-                robot.position.y = myrobot.y
-                robot.position.orientation = myrobot.orientation
-                robot.yellowteam = True
-                robot.turnon = True
-        if robotsBlue != None:
-            for myrobot in robotsBlue:
-                robot = replacement.robots.add()
-                robot.position.robot_id = myrobot.id
-                robot.position.x = myrobot.x
-                robot.position.y = myrobot.y
-                robot.position.orientation = myrobot.orientation
-                robot.yellowteam = False
-                robot.turnon = True
+        for myrobot in robotsYellow:
+            robot = replacement.robots.add()
+            robot.position.robot_id = myrobot.id
+            robot.position.x = myrobot.x
+            robot.position.y = myrobot.y
+            robot.position.orientation = myrobot.orientation
+            robot.yellowteam = myrobot.isYellow
+            robot.turnon = True
+        for myrobot in robotsBlue:
+            robot = replacement.robots.add()
+            robot.position.robot_id = myrobot.id
+            robot.position.x = myrobot.x
+            robot.position.y = myrobot.y
+            robot.position.orientation = myrobot.orientation
+            robot.yellowteam = myrobot.isYellow
+            robot.turnon = True
 
         packet = packet_pb2.Packet()
         packet.replace.CopyFrom(replacement)
@@ -81,6 +77,8 @@ class FIRASimClient():
 
 if __name__ == "__main__":
     cli = FIRASimClient('127.0.0.1', 50051)
+    cli1 = FIRASimClient('127.0.0.1', 50051)
+
     conv = Converter()
 
     command = messages_pb2.Command()
@@ -91,9 +89,10 @@ if __name__ == "__main__":
         wheelspeed.left = -10
     yelbot = conv.convert_protocommand_to_Robot(command, True)
     blubot = conv.convert_protocommand_to_Robot(command, False)
-
     while True:
-        cli.send_robot_command(yelbot, blubot)
+        cli.send_robot_command(robotsBlue=blubot)
+        cli1.send_robot_command(robotsYellow=yelbot)
+
 
     # robots = messages_pb2.Robots()
     # for i in range(5):
