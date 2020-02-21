@@ -67,4 +67,5 @@ if __name__ == "__main__":
     teamClient = TeamClient('127.0.0.1', 50052)
     frame = common_pb2.Frame()
     foulInfo = messages_pb2.FoulInfo()
-    print(teamClient.call_SetFormerRobots())
+    while True:
+        teamClient.call_RunStrategy(frame, foulInfo)

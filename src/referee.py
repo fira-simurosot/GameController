@@ -6,14 +6,11 @@ from protoCompiled import common_pb2
 from protoCompiled.REF2CLI import messages_pb2, service_pb2_grpc, service_pb2
 from src.firasimClient import FIRASimClient
 from src.firasimServer import FIRASimServer
-from src.teamClient import TeamClient
 from src.threadClient import ThreadClient, WhatToCallEnum
 from src.common import WorldModel, GameState, ActorEnum, Converter
-from multiprocessing import Process
 from PyQt5.QtWidgets import QApplication
-from PyQt5.QtCore import pyqtSlot, QTimer, QObject
 from src.gameControllerWidget import GameControllerWidget
-import math, time
+import math
 
 
 class Referee():
@@ -41,8 +38,6 @@ class Referee():
 
         sys.exit(self.app.exec_())
 
-
-
     def vision_detection(self, data):
         environment = packet_pb2.Environment()
         environment.ParseFromString(data)
@@ -62,7 +57,6 @@ class Referee():
         elif self.gamestate.is_play_on():
             self.yellowThread.set_arguments(WhatToCallEnum.RunStrategy, frame_yellow, foulinfo_yellow)
             self.blueThread.set_arguments(WhatToCallEnum.RunStrategy, frame_blue, foulinfo_blue)
-
 
     def createGUI(self):
         self.gamecontrollerWidget = GameControllerWidget()
@@ -111,8 +105,6 @@ class Referee():
             pass
         print('state = {}, actor = {}, phase = {}'.format(self.gamestate.state, self.gamestate.actor, self.gamestate.phase))
 
-
-
     def generate_foulinfo(self):
         foulinfo_yellow = messages_pb2.FoulInfo()
         foulinfo_yellow.type = self.gamestate.state
@@ -143,32 +135,6 @@ class Referee():
             robot.orientation = math.pi - robot.orientation
 
         return frame_yellow, frame_blue
-
-    def runStrategy_teams(self, frame, foulInfo):
-        yellowCommand = self.yellowClient.call_RunStrategy(frame, foulInfo)
-        BlueCommand = self.blueClient.call_RunStrategy(frame, foulInfo)
-        yelbot = self.converter.convert_protocommand_to_Robot(yellowCommand, True)
-        blubot = self.converter.convert_protocommand_to_Robot(BlueCommand, False)
-        self.firasimclient.send_robot_command(yelbot, blubot)
-
-    def robotPlacement_teams(self, frame, foulInfo):
-        if self.gamestate.actor == ActorEnum.Yellow:
-            yelbot = self.yellowClient.call_SetFormerRobots(frame, foulInfo)
-            blubot = self.blueClient.call_SetLaterRobots(frame, foulInfo)
-        else:
-            blubot = self.blueClient.call_SetFormerRobots(frame, foulInfo)
-            yelbot = self.yellowClient.call_SetLaterRobots(frame, foulInfo)
-        yelbot = self.converter.convert_protoRobots_to_Robot(yelbot, True)
-        blubot = self.converter.convert_protoRobots_to_Robot(blubot, False)
-        self.firasimclient.send_robot_replacement(yelbot, blubot)
-
-    def ballPlacement_teams(self, frame, foulInfo):
-        if self.gamestate.actor == ActorEnum.Yellow:
-            protoball = self.yellowClient.call_SetBall(frame, foulInfo)
-        else:
-            protoball = self.blueClient.call_SetBall(frame, foulInfo)
-        ball = self.converter.convert_protoBall_to_Ball(protoball)
-        self.firasimclient.send_ball_replacement(ball)
 
 
 if __name__ == "__main__":
