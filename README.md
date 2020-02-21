@@ -1,4 +1,4 @@
-# Handy Controller
+# Game Controller
 
 <p align="center">
 <img src="resources/screenshot.png" alt="GameController"
@@ -21,7 +21,7 @@ git submodule update --recursive --init
 #### Linux and macOS
 ```bash
 pip3 install virtualenv
-cd /path/to/handyController/directory
+cd /path/to/gameController/directory
 virtualenv env
 source env/bin/activate
 pip3 install -r requirements.txt
