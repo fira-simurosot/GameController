@@ -1,4 +1,5 @@
 import sys
+sys.path.insert(1, '../')
 sys.path.insert(1, '../protoCompiled')
 
 from protoCompiled.SIM2REF import packet_pb2
