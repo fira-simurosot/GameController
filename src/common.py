@@ -65,16 +65,13 @@ class GameState():
     def __init__(self):
         self.state = messages_pb2.FoulInfo.FoulType.PlaceKick
         self.actor = ActorEnum.NoOne
-        self.phase = messages_pb2.FoulInfo.PhaseType.FirstHalf
+        self.phase = messages_pb2.FoulInfo.PhaseType.Stopped
 
     def need_robot_placement(self):
         return self.state != messages_pb2.FoulInfo.FoulType.PlayOn
 
     def need_ball_placement(self):
         return self.state == messages_pb2.FoulInfo.FoulType.GoalKick
-
-    def is_play_on(self):
-        return self.state == messages_pb2.FoulInfo.FoulType.PlayOn
 
     def is_first_half(self):
         return self.phase == messages_pb2.FoulInfo.PhaseType.FirstHalf
@@ -87,6 +84,33 @@ class GameState():
 
     def is_stopped(self):
         return self.phase == messages_pb2.FoulInfo.PhaseType.Stopped
+
+    def is_play_on(self):
+        return self.state == messages_pb2.FoulInfo.FoulType.PlayOn
+
+    def is_place_kick(self):
+        return self.state == messages_pb2.FoulInfo.FoulType.PlaceKick
+
+    def is_penalty_kick(self):
+        return self.state == messages_pb2.FoulInfo.FoulType.PenaltyKick
+
+    def is_free_kick(self):
+        return self.state == messages_pb2.FoulInfo.FoulType.FreeKick
+
+    def is_goal_kick(self):
+        return self.state == messages_pb2.FoulInfo.FoulType.GoalKick
+
+    def is_free_ball_left_top(self):
+        return self.state == messages_pb2.FoulInfo.FoulType.FreeBallLeftTop
+
+    def is_free_ball_right_top(self):
+        return self.state == messages_pb2.FoulInfo.FoulType.FreeBallRightTop
+
+    def is_free_ball_left_bot(self):
+        return self.state == messages_pb2.FoulInfo.FoulType.FreeBallLeftBot
+
+    def is_free_ball_right_bot(self):
+        return self.state == messages_pb2.FoulInfo.FoulType.FreeBallRightBot
 
 class Converter():
     def __init__(self):

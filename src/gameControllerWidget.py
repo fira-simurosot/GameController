@@ -30,6 +30,9 @@ class GameControllerWidget(QWidget):
     def connections(self):
         self.timer.timeout.connect(self.handleTimer)
 
+        self.pbTeamNameYellow.clicked.connect(partial(self.btnListener, "pbTeamNameYellow"))
+        self.pbTeamNameBlue.clicked.connect(partial(self.btnListener, "pbTeamNameBlue"))
+
         self.pbPlaceKickBlue.clicked.connect(partial(self.btnListener, "pbPlaceKickBlue"))
         self.pbPnaltyKickBlue.clicked.connect(partial(self.btnListener, "pbPnaltyKickBlue"))
         self.pbFreeKickBlue.clicked.connect(partial(self.btnListener, "pbFreeKickBlue"))
@@ -57,10 +60,26 @@ class GameControllerWidget(QWidget):
 
     def btnListener(self, buttonName):
         self.button_clicked.emit(buttonName)
+        if buttonName == 'pbfirstHalf':
+            self.start_timer(True)
+            self.step = 0
+        elif buttonName == 'pbsecondHalf':
+            self.start_timer(True)
+            self.step = 0
+        elif buttonName == 'pbpenalty':
+            self.start_timer(True)
+            self.step = 0
+        elif buttonName == 'pbpenalty':
+            self.start_timer(True)
+            self.step = 0
+        elif buttonName == 'pbTeamNameYellow':
+            self.labelScoreYellow.setText(str(int(self.labelScoreYellow.text()) + 1))
+        elif buttonName == 'pbTeamNameBlue':
+            self.labelScoreBlue.setText(str(int(self.labelScoreBlue.text()) + 1))
 
     def set_teamnames(self, yellow_name, blue_name):
-        self.labelTeamNameYellow.setText(yellow_name)
-        self.labelTeamNameBlue.setText(blue_name)
+        self.pbTeamNameYellow.setText(yellow_name)
+        self.pbTeamNameBlue.setText(blue_name)
 
     def start_timer(self, clean):
         if clean:
@@ -76,12 +95,13 @@ class GameControllerWidget(QWidget):
             self.sec = 0
         self.labelTimer.setText(str(self.min) + ':' + str(self.sec))
 
-    def updateStats(self, scoreBlue, scoreYellow):
-        #handle request
+    def stepper(self):
         self.step += 1
         self.labelsteper.setText('step ' + str(self.step) + ' / 18000')
         if self.step > 18000:
             self.labelsteper.setStyleSheet('QLabel{color: red}')
+
+    def updateScores(self, scoreBlue, scoreYellow):
         self.labelScoreBlue.setText(str(scoreBlue))
         self.labelScoreYellow.setText(str(scoreYellow))
 

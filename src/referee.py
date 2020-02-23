@@ -44,6 +44,16 @@ class Referee():
         environment.ParseFromString(data)
         # self.worldmodel.update_worldmodel(environment)
 
+        if self.gamestate.is_first_half() or self.gamestate.is_second_half():
+            self.gamecontrollerWidget.stepper()
+
+        self.prepairation()
+        self.handle_clients(environment)
+
+    def prepairation(self):
+        pass
+
+    def handle_clients(self, environment):
         (foulinfo_yellow, foulinfo_blue) = self.generate_foulinfo()
         (frame_yellow, frame_blue) = self.generate_frame(environment)
 
