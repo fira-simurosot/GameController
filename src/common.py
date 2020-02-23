@@ -18,9 +18,9 @@ class Robot():
         self.wheel_left = 0.0
 
 class Ball():
-    def __init__(self):
-        self.x = 0.0
-        self.y = 0.0
+    def __init__(self, x = 0.0, y = 0.0):
+        self.x = x
+        self.y = y
 
 class WorldModel():
     def __init__(self):
@@ -66,6 +66,9 @@ class GameState():
         self.state = messages_pb2.FoulInfo.FoulType.PlaceKick
         self.actor = ActorEnum.NoOne
         self.phase = messages_pb2.FoulInfo.PhaseType.Stopped
+
+    def is_actor_yellow(self):
+        return self.actor == ActorEnum.Yellow
 
     def need_robot_placement(self):
         return self.state != messages_pb2.FoulInfo.FoulType.PlayOn
