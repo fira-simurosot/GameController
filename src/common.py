@@ -76,6 +76,18 @@ class GameState():
     def is_play_on(self):
         return self.state == messages_pb2.FoulInfo.FoulType.PlayOn
 
+    def is_first_half(self):
+        return self.phase == messages_pb2.FoulInfo.PhaseType.FirstHalf
+
+    def is_second_half(self):
+        return self.phase == messages_pb2.FoulInfo.PhaseType.SecondHalf
+
+    def is_penalty_shootout(self):
+        return self.phase == messages_pb2.FoulInfo.PhaseType.PenaltyShootout
+
+    def is_stopped(self):
+        return self.phase == messages_pb2.FoulInfo.PhaseType.Stopped
+
 class Converter():
     def __init__(self):
         pass
