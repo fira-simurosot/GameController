@@ -3,6 +3,10 @@ from protoCompiled.SIM2REF import packet_pb2, replacement_pb2, command_pb2
 from protoCompiled.REF2CLI import messages_pb2
 from enum import Enum
 
+
+ROBOT_NUM = 5
+
+
 class Robot():
     def __init__(self):
         self.id = 0

@@ -48,6 +48,7 @@ class ThreadClient(QThread):
             self.teamName = res.name
         elif self.what_to_call == WhatToCallEnum.SetBall:
             res = self.teamClient.call_SetBall(self.frame, self.foulinfo)
+            res = self.symmetric_ball_position(res) if self.isYellow else res
             ball = self.converter.convert_protoBall_to_Ball(res)
             self.firasimclient.send_ball_replacement(ball)
         elif self.what_to_call == WhatToCallEnum.SetFormerRobots:
@@ -73,5 +74,9 @@ class ThreadClient(QThread):
             robot.x *= -1
             robot.orientation = math.pi - robot.orientation
         return protorobots
+
+    def symmetric_ball_position(self, protoball):
+        protoball.x *= -1
+        return protoball
 
 

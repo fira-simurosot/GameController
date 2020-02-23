@@ -5,8 +5,7 @@ import socket
 from protoCompiled import common_pb2
 from protoCompiled.SIM2REF import packet_pb2, replacement_pb2, command_pb2
 from protoCompiled.REF2CLI import messages_pb2
-from src.common import Robot, Ball
-from src.common import Converter
+from src.common import Robot, Ball, Converter, ROBOT_NUM
 
 
 class FIRASimClient():
@@ -39,8 +38,23 @@ class FIRASimClient():
         # print(packet)
         self.sock.sendto(packet.SerializeToString(), (self.ip, self.port))
 
+    def send_halt_robot_command(self):
+        yellow_robots = []
+        blue_robots = []
+        for i in range(ROBOT_NUM):
+            yel = Robot()
+            yel.id = i
+            yel.isYellow = True
+            yellow_robots.append(yel)
+            blu = Robot()
+            blu.id = i
+            blu.isYellow = False
+            blue_robots.append(blu)
+        self.send_robot_command(yellow_robots, blue_robots)
+
 
     def send_robot_replacement(self, robotsYellow = [], robotsBlue = []):
+        self.send_halt_robot_command()
         replacement = replacement_pb2.Replacement()
         for myrobot in robotsYellow:
             robot = replacement.robots.add()
@@ -64,6 +78,7 @@ class FIRASimClient():
         self.sock.sendto(packet.SerializeToString(), (self.ip, self.port))
 
     def send_ball_replacement(self, ball):
+        self.send_halt_robot_command()
         replacement = replacement_pb2.Replacement()
         replacement.ball.x = ball.x
         replacement.ball.y = ball.y

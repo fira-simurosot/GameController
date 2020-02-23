@@ -50,11 +50,26 @@ class Referee():
         if self.gamestate.need_ball_placement():
             if self.gamestate.actor == ActorEnum.Yellow:
                 self.yellowThread.set_arguments(WhatToCallEnum.SetBall, frame_yellow, foulinfo_yellow)
+                self.yellowThread.wait(1000)
+                self.yellowThread.set_arguments(WhatToCallEnum.SetFormerRobots, frame_yellow, foulinfo_yellow)
+                self.blueThread.set_arguments(WhatToCallEnum.SetLaterRobots, frame_blue, foulinfo_blue)
             else:
                 self.blueThread.set_arguments(WhatToCallEnum.SetBall, frame_blue, foulinfo_blue)
+                self.blueThread.wait(1000)
+                self.blueThread.set_arguments(WhatToCallEnum.SetFormerRobots, frame_blue, foulinfo_blue)
+                self.yellowThread.set_arguments(WhatToCallEnum.SetLaterRobots, frame_yellow, foulinfo_yellow)
         elif self.gamestate.need_robot_placement():
-            self.yellowThread.set_arguments(WhatToCallEnum.SetFormerRobots, frame_yellow, foulinfo_yellow)
-            self.blueThread.set_arguments(WhatToCallEnum.SetLaterRobots, frame_blue, foulinfo_blue)
+            if self.gamestate.actor == ActorEnum.Yellow:
+                self.yellowThread.set_arguments(WhatToCallEnum.SetFormerRobots, frame_yellow, foulinfo_yellow)
+                self.yellowThread.wait(1000)
+                self.blueThread.set_arguments(WhatToCallEnum.SetLaterRobots, frame_blue, foulinfo_blue)
+                self.blueThread.wait(1000)
+            else:
+                self.blueThread.set_arguments(WhatToCallEnum.SetFormerRobots, frame_blue, foulinfo_blue)
+                self.blueThread.wait(1000)
+                self.yellowThread.set_arguments(WhatToCallEnum.SetLaterRobots, frame_yellow, foulinfo_yellow)
+                self.yellowThread.wait(1000)
+
         elif self.gamestate.is_play_on():
             self.yellowThread.set_arguments(WhatToCallEnum.RunStrategy, frame_yellow, foulinfo_yellow)
             self.blueThread.set_arguments(WhatToCallEnum.RunStrategy, frame_blue, foulinfo_blue)
