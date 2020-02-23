@@ -8,7 +8,7 @@ from protoCompiled.REF2CLI import messages_pb2, service_pb2_grpc, service_pb2
 from src.firasimClient import FIRASimClient
 from src.firasimServer import FIRASimServer
 from src.threadClient import ThreadClient, WhatToCallEnum
-from src.common import WorldModel, GameState, ActorEnum, Converter
+from src.common import WorldModel, GameState, ActorEnum, Converter, Ball
 from PyQt5.QtWidgets import QApplication
 from src.gameControllerWidget import GameControllerWidget
 import math
@@ -47,11 +47,37 @@ class Referee():
         if self.gamestate.is_first_half() or self.gamestate.is_second_half():
             self.gamecontrollerWidget.stepper()
 
-        self.prepairation()
+        self.preparation()
         self.handle_clients(environment)
 
-    def prepairation(self):
-        pass
+    def preparation(self):
+        if self.gamestate.is_place_kick():
+            ball = Ball(0, 0)
+            self.firasimclient.send_ball_replacement(ball)
+        elif self.gamestate.is_penalty_kick():
+            if self.gamestate.is_actor_yellow():
+                ball = Ball(-0.5, 0)
+                self.firasimclient.send_ball_replacement(ball)
+            else:
+                ball = Ball(0.5, 0)
+                self.firasimclient.send_ball_replacement(ball)
+        elif self.gamestate.is_free_kick():
+            pass
+        elif self.gamestate.is_free_ball_left_top():
+            ball = Ball(-0.5, 0.5)
+            self.firasimclient.send_ball_replacement(ball)
+        elif self.gamestate.is_free_ball_right_top():
+            ball = Ball(0.5, 0.5)
+            self.firasimclient.send_ball_replacement(ball)
+        elif self.gamestate.is_free_ball_left_bot():
+            ball = Ball(-0.5, -0.5)
+            self.firasimclient.send_ball_replacement(ball)
+        elif self.gamestate.is_free_ball_right_bot():
+            ball = Ball(0.5, -0.5)
+            self.firasimclient.send_ball_replacement(ball)
+
+
+
 
     def handle_clients(self, environment):
         (foulinfo_yellow, foulinfo_blue) = self.generate_foulinfo()
@@ -135,9 +161,18 @@ class Referee():
         foulinfo_yellow = messages_pb2.FoulInfo()
         foulinfo_yellow.type = self.gamestate.state
         foulinfo_yellow.phase = self.gamestate.phase
+        if foulinfo_yellow.type == messages_pb2.FoulInfo.FoulType.FreeBallLeftTop:
+            foulinfo_yellow.type = messages_pb2.FoulInfo.FoulType.FreeBallRightTop
+        elif foulinfo_yellow.type == messages_pb2.FoulInfo.FoulType.FreeBallRightTop:
+            foulinfo_yellow.type = messages_pb2.FoulInfo.FoulType.FreeBallLeftTop
+        elif foulinfo_yellow.type == messages_pb2.FoulInfo.FoulType.FreeBallLeftBot:
+            foulinfo_yellow.type = messages_pb2.FoulInfo.FoulType.FreeBallRightBot
+        elif foulinfo_yellow.type == messages_pb2.FoulInfo.FoulType.FreeBallRightBot:
+            foulinfo_yellow.type = messages_pb2.FoulInfo.FoulType.FreeBallLeftBot
 
         foulinfo_blue = messages_pb2.FoulInfo()
         foulinfo_blue.CopyFrom(foulinfo_yellow)
+
         if self.gamestate.actor == ActorEnum.Yellow:
             foulinfo_blue.actor = messages_pb2.Side.Opponent
             foulinfo_yellow.actor = messages_pb2.Side.Self
